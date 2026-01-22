@@ -2,7 +2,7 @@
 #include<algorithm>
 #include<vector>
 #include<array>
-
+#include <cmath>
 #include <unordered_map>
 #include<unordered_set>
 #include <map>
@@ -134,58 +134,174 @@ b - a 等于 arr 中任意两个元素的最小绝对差
 
 */
 
-class Solution {
-public:
-    vector<vector<int>> merge(vector<vector<int>>& intervals) {
-        sort(intervals.begin(),intervals.end());
-        vector<vector<int>> out;
+// class Solution {
+// public:
+//     vector<vector<int>> merge(vector<vector<int>>& intervals) {
+//         sort(intervals.begin(),intervals.end());
+//         vector<vector<int>> out;
         
-        for(int i=0;i<intervals.size()-1;){
-            if(intervals[i][1]>=intervals[i+1][1]){
+//         for(int i=0;i<intervals.size()-1;){
+//             if(intervals[i][1]>=intervals[i+1][1]){
 
-                intervals.erase(intervals.begin()+i+1);
-                continue;
-            }
-            else if(intervals[i][1]>=intervals[i+1][0]){
-                intervals[i][1]=intervals[i+1][1];
-                intervals.erase(intervals.begin()+i+1);
-                continue;
-            }
-            i++;
-        }
-        return intervals;
-    }
-};
+//                 intervals.erase(intervals.begin()+i+1);
+//                 continue;
+//             }
+//             else if(intervals[i][1]>=intervals[i+1][0]){
+//                 intervals[i][1]=intervals[i+1][1];
+//                 intervals.erase(intervals.begin()+i+1);
+//                 continue;
+//             }
+//             i++;
+//         }
+//         return intervals;
+//     }
+// };
 
 
-class Solution {
-public:
-    vector<vector<int>> merge(vector<vector<int>>& intervals) {
-        if (intervals.empty()) return {};
+// class Solution {
+// public:
+//     vector<vector<int>> merge(vector<vector<int>>& intervals) {
+//         if (intervals.empty()) return {};
 
-        // 1. 排序 O(N log N)
-        sort(intervals.begin(), intervals.end());
+//         // 1. 排序 O(N log N)
+//         sort(intervals.begin(), intervals.end());
 
-        vector<vector<int>> out;
+//         vector<vector<int>> out;
         
-        // 2. 将第一个区间先放入结果集
-        out.push_back(intervals[0]);
+//         // 2. 将第一个区间先放入结果集
+//         out.push_back(intervals[0]);
 
-        // 3. 遍历剩下的区间 O(N)
-        for (int i = 1; i < intervals.size(); i++) {
-            // 我们拿结果集中“最后一个合并完的区间”来对比当前区间
-            // out.back() 代表当前已经合并好的最后一个区间
+//         // 3. 遍历剩下的区间 O(N)
+//         for (int i = 1; i < intervals.size(); i++) {
+//             // 我们拿结果集中“最后一个合并完的区间”来对比当前区间
+//             // out.back() 代表当前已经合并好的最后一个区间
             
-            if (out.back()[1] >= intervals[i][0]) {
-                // 如果【上一个的终点】 >= 【当前的起点】，说明有重叠，进行合并
-                // 注意：终点要取两者的最大值，防止 [1, 4] 和 [2, 3] 这种情况
-                out.back()[1] = max(out.back()[1], intervals[i][1]);
-            } else {
-                // 如果没有重叠，说明上一个区间彻底结束了，把当前区间作为一个新的项加入
-                out.push_back(intervals[i]);
-            }
-        }
+//             if (out.back()[1] >= intervals[i][0]) {
+//                 // 如果【上一个的终点】 >= 【当前的起点】，说明有重叠，进行合并
+//                 // 注意：终点要取两者的最大值，防止 [1, 4] 和 [2, 3] 这种情况
+//                 out.back()[1] = max(out.back()[1], intervals[i][1]);
+//             } else {
+//                 // 如果没有重叠，说明上一个区间彻底结束了，把当前区间作为一个新的项加入
+//                 out.push_back(intervals[i]);
+//             }
+//         }
 
-        return out;
+//         return out;
+//     }
+// };
+
+/*
+给定一个长度为 n 的整数 山脉 数组 arr ，其中的值递增到一个 峰值元素 然后递减。
+
+返回峰值元素的下标。
+
+你必须设计并实现时间复杂度为 O(log(n)) 的解决方案。
+
+示例 1：
+
+输入：arr = [0,1,0]
+输出：1
+示例 2：
+
+输入：arr = [0,2,1,0]
+输出：1
+示例 3：
+
+输入：arr = [0,10,5,2]
+输出：1
+ 
+*/
+// class Solution {
+// public:
+//     int peakIndexInMountainArray(vector<int>& arr) {
+//         //本质找最大值看左右两边哪个比中间这个数大，如果左边数大，末尾指针指过来，右边数大，头指针之过来
+//         int head=0;
+//         int rear=arr.size()-1;
+//         int naka=0;
+//         while (head<=rear)
+//         {
+//             /* code */
+//             naka=(head+rear)/2;
+//             if(naka>1&&arr[naka]<arr[naka-1]){
+//                 rear=naka-1;
+//             }
+//             if(naka<(arr.size()-1)&&arr[naka]<arr[naka+1]){
+//                 head=naka+1;
+//             }
+//             if(arr[naka]>arr[naka+1]&&arr[naka]>arr[naka-1])return naka;
+//         }
+
+//         return -1;
+//     }
+// };
+
+
+/*
+给定一个非负整数 c ，
+你要判断是否存在两个整数 a 和 b，
+使得 a2 + b2 = c 。
+示例 1：
+输入：c = 5
+输出：true
+解释：1 * 1 + 2 * 2 = 5
+示例 2：
+输入：c = 3
+输出：false
+*/
+
+// class Solution {
+// public:
+//     bool judgeSquareSum(int c) {
+//         long long head=0;
+//         long long rear=sqrt(c);
+//         long long sum;
+//         while (head<rear)
+//         {
+//             /* code */
+//             sum=head*head+rear*rear;
+//             if(sum==c){
+//                 return 1;
+//             }
+//             else if(sum>c){
+//                 rear--;
+//             }
+//             else{
+//                 head++;
+//             }
+//         }
+//         return -1;
+        
+//     }
+// };
+
+
+/*
+整数数组 nums 按升序排列，数组中的值 互不相同 。
+在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 向左旋转，
+使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。
+例如， [0,1,2,4,5,6,7] 下标 3 上向左旋转后可能变为 [4,5,6,7,0,1,2] 。
+给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，
+则返回它的下标，否则返回 -1 。
+你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+*/
+
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        unordered_map<int,int> map;
+        for(int i=0;i<nums.size();i++){
+            map[nums[i]]=i;
+        }
+        auto it=map.find(target);
+        if(it!=map.end())return it->second;
+        else return -1;
     }
 };
+
+int main(){
+
+    vector<int> arr={0,2,1,0};
+    Solution planc;
+    // planc.peakIndexInMountainArray(arr);
+    planc.judgeSquareSum(3);
+}
