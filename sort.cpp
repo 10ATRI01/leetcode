@@ -285,23 +285,139 @@ b - a 等于 arr 中任意两个元素的最小绝对差
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
 */
 
+// class Solution {
+// public:
+//     int search(vector<int>& nums, int target) {
+//         unordered_map<int,int> map;
+//         for(int i=0;i<nums.size();i++){
+//             map[nums[i]]=i;
+//         }
+//         auto it=map.find(target);
+//         if(it!=map.end())return it->second;
+//         else return -1;
+//     }
+// };
+
+/*
+给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+*/
+
+// class Solution {
+// public:
+//     int findKthLargest(vector<int>& nums, int k) {
+//         sort(nums.begin(),nums.end(),greater<int>());
+//         return nums[k-1];
+//     }
+// };
+
+/*
+给你一个整数数组 nums，请你将该数组升序排列。
+你必须在 不使用任何内置函数 的情况下解决问题，
+时间复杂度为 O(nlog(n))，并且空间复杂度尽可能小。
+*/
+
+
+// //来写个归并排序吧
+// class Solution {
+// public:
+
+//     vector<int> sortArray(vector<int>& nums) {
+
+//     }
+// };
+
+
+/*
+给定单个链表的头 head ，使用 插入排序 对链表进行排序，并返回 排序后链表的头 。
+
+插入排序 算法的步骤:
+
+插入排序是迭代的，每次只移动一个元素，直到所有元素可以形成一个有序的输出列表。
+每次迭代中，插入排序只从输入数据中移除一个待排序的元素，找到它在序列中适当的位置，并将其插入。
+重复直到所有输入数据插入完为止。
+下面是插入排序算法的一个图形示例。部分排序的列表(黑色)最初只包含列表中的第一个元素。每次迭代时，从输入数据中删除一个元素(红色)，并就地插入已排序的列表中。
+
+对链表进行插入排序。
+*/
+
+ struct ListNode {
+      int val;
+      ListNode *next;
+      ListNode() : val(0), next(nullptr) {}
+      ListNode(int x) : val(x), next(nullptr) {}
+      ListNode(int x, ListNode *next) : val(x), next(next) {}
+ };
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
 class Solution {
 public:
-    int search(vector<int>& nums, int target) {
-        unordered_map<int,int> map;
-        for(int i=0;i<nums.size();i++){
-            map[nums[i]]=i;
+    ListNode* insertionSortList(ListNode* head) {
+        // 1. 特判：如果没有节点或只有一个节点，直接返回
+        if (head == nullptr || head->next == nullptr) {
+            return head;
         }
-        auto it=map.find(target);
-        if(it!=map.end())return it->second;
-        else return -1;
+
+        // 2. 创建虚拟头结点，方便在头部插入
+        ListNode *dummy = new ListNode(0);
+        dummy->next = head;
+
+        // 3. 初始化指针
+        // lastSorted: 已排序区间的最后一个节点（初始就是 head）
+        // curr: 当前准备进行排序的节点（初始是 head 的下一个）
+        ListNode *lastSorted = head;
+        ListNode *curr = head->next;
+
+        while (curr != nullptr) {
+            // 【情况 A】如果当前节点比已排序的最后一个还要大（或相等）
+            // 说明顺序是对的，直接把已排序区间向后扩展一位
+            if (lastSorted->val <= curr->val) {
+                lastSorted = lastSorted->next;
+            } 
+            // 【情况 B】当前节点比 lastSorted 小，需要插入到前面去
+            else {
+                // 我们需要从头开始找，找到第一个比 curr 大的节点的前一个位置
+                ListNode *prev = dummy;
+                while (prev->next->val <= curr->val) {
+                    prev = prev->next;
+                }
+
+                // 此时 prev 的后面就是 curr 应该插入的位置
+                // 开始断链和重连操作：
+                
+                // 1. 把 curr 从原位置（lastSorted 后面）拿出来
+                lastSorted->next = curr->next;
+                
+                // 2. 把 curr 插到 prev 后面
+                curr->next = prev->next;
+                prev->next = curr;
+            }
+
+            // 【迭代】准备处理下一个节点
+            // 注意：如果刚才发生了插入操作，lastSorted 不需要动，因为它的 next 已经更新为新的待排序节点了
+            // 如果刚才没发生插入（情况 A），lastSorted 在上面已经动过了
+            curr = lastSorted->next;
+        }
+
+        return dummy->next;
     }
 };
+
 
 int main(){
 
     vector<int> arr={0,2,1,0};
     Solution planc;
     // planc.peakIndexInMountainArray(arr);
-    planc.judgeSquareSum(3);
+    // planc.judgeSquareSum(3);
 }
