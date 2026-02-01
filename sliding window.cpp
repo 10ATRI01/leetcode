@@ -152,32 +152,32 @@ using namespace std;
 给你一个字符串 s，请你返回它的 最长快乐前缀。如果不存在满足题意的前缀，则返回一个空字符串 "" 
 */
 
-class Solution {
-public:
-    string longestPrefix(string s) {
-        int remainder=100000007;
-        int base=31;       
-        long long int left_sum=0;
-        long long int right_sum=0;
-        long long int mul=1;
-        int max=0;
-        int reverse_i=0;
-        string out;
-        for(int i=0;i<s.size()-1;i++){
-            reverse_i=s.size()-i-1;
-            left_sum=(left_sum*base+s[i])%remainder;
-            right_sum=(right_sum+s[reverse_i]*mul)%remainder;
-            mul=(mul*base)%remainder;
-            if(left_sum==right_sum){
-                //更新输出
-                max=i+1;
-            }
-        }
-        out=s.substr(0,max);
-        return out;
+// class Solution {
+// public:
+//     string longestPrefix(string s) {
+//         int remainder=100000007;
+//         int base=31;       
+//         long long int left_sum=0;
+//         long long int right_sum=0;
+//         long long int mul=1;
+//         int max=0;
+//         int reverse_i=0;
+//         string out;
+//         for(int i=0;i<s.size()-1;i++){
+//             reverse_i=s.size()-i-1;
+//             left_sum=(left_sum*base+s[i])%remainder;
+//             right_sum=(right_sum+s[reverse_i]*mul)%remainder;
+//             mul=(mul*base)%remainder;
+//             if(left_sum==right_sum){
+//                 //更新输出
+//                 max=i+1;
+//             }
+//         }
+//         out=s.substr(0,max);
+//         return out;
         
-    }
-};
+//     }
+// };
 
 /*
 你需要从空字符串开始 构造 一个长度为 n 的字符串 s ，
@@ -187,36 +187,53 @@ public:
 si 的 得分 为 si 和 sn 的 最长公共前缀 的长度（注意 s == sn ）。
 给你最终的字符串 s ，请你返回每一个 si 的 得分之和 。
 */
+//z算法
 
 class Solution {
 public:
     long long sumScores(string s) {
-        int base=31;
-        int remainder=100000007;
-        long long sum_score=0;//得分
-        long long left_haxi=0;
-        long long right_haxi=0;
-        long long mul=1;
-        int reverse_now=0;
-        for(int now=0;now<s.size()-2;now++){
-            reverse_now=s.size()-now-1;
-            left_haxi=(left_haxi*base+s[now])%remainder;
-            right_haxi=(right_haxi+s[reverse_now]*mul)%remainder;
-            mul=(mul*base)%remainder;
-            if(left_haxi==right_haxi){
-                sum_score+=now+1;
+        int n = s.size();
+        // 1. z 数组：z[i] 表示从下标 i 开始的后缀与原串的最长公共前缀长度
+        vector<int> z(n, 0);
+        
+        // 2. sum 必须用 long long，防止 10^5 长度的字符串累加时溢出
+        // 初始值为 n，因为字符串本身（s_n）与自己的公共前缀长度就是 n
+        long long sum = n; 
+        
+        // 3. l 和 r 维护当前的“匹配窗口”（克隆区）
+        int l = 0, r = 0;
+        
+        for (int i = 1; i < n; i++) {
+            // 情况 A：如果在窗口内，先通过双胞胎抄答案，但不能超过窗口边界
+            if (i <= r) {
+                z[i] = min(r - i + 1, z[i - l]);
             }
+            
+            // 情况 B：无论抄了多少，尝试继续暴力向后扩展
+            // 比较后缀字符 s[i + z[i]] 和前缀字符 s[z[i]]
+            while (i + z[i] < n && s[z[i]] == s[i + z[i]]) {
+                z[i]++;
+            }
+            
+            // 4. 如果新的匹配终点超过了旧的 r，更新窗口边界 [l, r]
+            if (i + z[i] - 1 > r) {
+                l = i;
+                r = i + z[i] - 1;
+            }
+            
+            // 5. 累加每一个后缀的得分
+            sum += z[i];
         }
-        sum_score+=s.size();
-        return sum_score;
+        
+        return sum;
     }
 };
 
 
 
 int main(){
-    string s="level";
+    string s="bababcde";
     Solution plan;
-    // plan.longestPrefix(s);
+    plan.sumScores(s);
     return 0;
 }
